@@ -872,9 +872,9 @@ class WC_Bulk_Price_Editor {
                     </tr>
                 </table>
                 <p class="submit">
-                    <input type="button" id="test-ajax" class="button-secondary" value="<?php esc_attr_e('Test AJAX', 'wc-bulk-price-editor'); ?>" />
+                    <!--<input type="button" id="test-ajax" class="button-secondary" value="<?php esc_attr_e('Test AJAX', 'wc-bulk-price-editor'); ?>" />-->
                     <input type="button" id="filter-products" class="button-primary" value="<?php esc_attr_e('Filter Products', 'wc-bulk-price-editor'); ?>" />
-                    <input type="button" id="cleanup-database" class="button-secondary" value="<?php esc_attr_e('Speed Up Database', 'wc-bulk-price-editor'); ?>" style="background: #d63638; border-color: #d63638; color: white;" />
+                    <!--<input type="button" id="cleanup-database" class="button-secondary" value="<?php esc_attr_e('Speed Up Database', 'wc-bulk-price-editor'); ?>" style="background: #d63638; border-color: #d63638; color: white;" />-->
                 </p>
             </div>
 
