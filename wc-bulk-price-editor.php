@@ -29,6 +29,7 @@ class WC_Bulk_Price_Editor {
         // AJAX actions
         add_action('wp_ajax_wc_bulk_price_test', array($this, 'ajax_test'));
         add_action('wp_ajax_wc_bulk_price_filter', array($this, 'ajax_filter_products'));
+        add_action('wp_ajax_wc_bulk_price_load_categories', array($this, 'ajax_load_categories'));
         add_action('wp_ajax_wc_bulk_price_simple_update', array($this, 'ajax_simple_update'));
         add_action('wp_ajax_wc_bulk_price_cleanup_db', array($this, 'ajax_cleanup_database'));
         
@@ -348,13 +349,30 @@ class WC_Bulk_Price_Editor {
         }
         
         $search_word = sanitize_text_field($_POST['search_word']);
+        $category_id = isset($_POST['category_id']) ? intval($_POST['category_id']) : 0;
         
         $args = array(
             'post_type' => array('product', 'product_variation'),
             'post_status' => 'publish',
             'posts_per_page' => 150,
-            's' => $search_word
         );
+        
+        // Add search term if provided
+        if (!empty($search_word)) {
+            $args['s'] = $search_word;
+        }
+        
+        // Add category filter if provided
+        if ($category_id > 0) {
+            $args['tax_query'] = array(
+                array(
+                    'taxonomy' => 'product_cat',
+                    'field' => 'term_id',
+                    'terms' => $category_id,
+                    'include_children' => true
+                )
+            );
+        }
         
         $products = get_posts($args);
         
@@ -447,6 +465,39 @@ class WC_Bulk_Price_Editor {
         $html .= '</div>';
         
         wp_send_json_success(array('html' => $html, 'count' => count($products)));
+    }
+
+    public function ajax_load_categories() {
+        if (!wp_verify_nonce($_POST['nonce'], 'wc_bulk_price_nonce')) {
+            wp_send_json_error(array('message' => 'Nonce failed'));
+        }
+        
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
+        // Get all product categories
+        $categories = get_terms(array(
+            'taxonomy' => 'product_cat',
+            'hide_empty' => false,
+            'orderby' => 'name',
+            'order' => 'ASC'
+        ));
+        
+        if (is_wp_error($categories) || empty($categories)) {
+            wp_send_json_error(array('message' => 'No categories found'));
+        }
+        
+        $html = '<option value="">All Categories</option>';
+        foreach ($categories as $category) {
+            $html .= sprintf(
+                '<option value="%d">%s</option>',
+                $category->term_id,
+                esc_html($category->name)
+            );
+        }
+        
+        wp_send_json_success(array('html' => $html));
     }
 
     public function ajax_simple_update() {
@@ -788,6 +839,15 @@ class WC_Bulk_Price_Editor {
                         <td>
                             <input type="text" id="search_word" name="search_word" placeholder="Enter product name" class="regular-text" />
                             <p class="description">Search for products containing this word</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="category_id">Product Category</label></th>
+                        <td>
+                            <select id="category_id" name="category_id" class="regular-text">
+                                <option value="">All Categories</option>
+                            </select>
+                            <p class="description">Filter by product category</p>
                         </td>
                     </tr>
                 </table>

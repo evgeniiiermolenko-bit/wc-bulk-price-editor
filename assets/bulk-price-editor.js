@@ -3,6 +3,9 @@ jQuery(document).ready(function($) {
     let successfulBatches = 0;
     let totalBatches = 0;
     
+    // Load categories on page load
+    loadCategories();
+    
     // Test AJAX connection on page load
     setTimeout(function() {
         console.log('Page loaded, testing AJAX...');
@@ -95,10 +98,7 @@ jQuery(document).ready(function($) {
         var formData = {
             action: 'wc_bulk_price_filter',
             nonce: wcBulkPrice.nonce,
-            filter_type: $('#filter_type').val(),
             search_word: $('#search_word').val(),
-            attribute_name: $('#attribute_name').val(),
-            attribute_value: $('#attribute_value').val(),
             category_id: $('#category_id').val(),
             limit: 100 // Limit results for performance
         };
