@@ -343,6 +343,16 @@ class WC_Bulk_Price_Editor {
             if ($sale_action === 'set' && $sale_value > 0) {
                 $new_sale = $sale_value;
                 error_log("Setting sale price to: $new_sale");
+            } elseif ($sale_action === 'decrease_percent' && $sale_value != 0) {
+                // Calculate sale price as a percentage decrease from the NEW regular price
+                $base_regular = ($regular_action !== 'none' && abs($new_regular - $current_regular) > 0.01) ? $new_regular : $current_regular;
+                if ($base_regular > 0) {
+                    $new_sale = $base_regular * (1 - ($sale_value / 100));
+                    $new_sale = max(0, $new_sale); // Don't go below 0
+                    error_log("Setting sale price as {$sale_value}% decrease from regular ({$base_regular}): $new_sale");
+                } else {
+                    wp_send_json_error(array('message' => 'Cannot calculate sale price by percentage when regular price is 0'));
+                }
             } elseif ($sale_action === 'clear_sale') {
                 $new_sale = 0;
                 error_log("Clearing sale price");
@@ -649,6 +659,7 @@ class WC_Bulk_Price_Editor {
                                 <select id="sale_price_action">
                                     <option value="none">Do Not Change</option>
                                     <option value="set">Set Fixed Price</option>
+                                    <option value="decrease_percent">Decrease by % (from Regular)</option>
                                     <option value="clear_sale">Clear Sale Price</option>
                                 </select>
                             </td>

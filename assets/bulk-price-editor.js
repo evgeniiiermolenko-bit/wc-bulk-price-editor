@@ -64,36 +64,32 @@ jQuery(document).ready(function($) {
         }
     });
 
-    // Function to update price unit based on action for a given prefix (regular_ or sale_)
-    function updatePriceUnit(prefix) {
+    // Function to update price input visibility based on action
+    function updatePriceInputVisibility(prefix) {
         var action = $('#' + prefix + 'price_action').val();
-        var unit = '$';
         var valueRow = $('.' + prefix + 'price-value-row');
 
-        if (action.includes('percent')) {
-            unit = '%';
+        // Show value input for actions that need a value
+        if (action === 'set' || action.includes('percent')) {
             valueRow.show();
-        } else if (action === 'set' || action.includes('amount')) {
-            unit = '$';
-            valueRow.show();
-        } else if (action === 'clear_sale' || action === 'none') {
-            valueRow.hide(); // Hide value input if action is 'none' or 'clear_sale'
+        } else {
+            // Hide for 'none' and 'clear_sale' actions
+            valueRow.hide();
         }
-        $('#' + prefix + 'price_unit').text(unit);
     }
 
-    // Initialize units on load
-    updatePriceUnit('regular_');
-    updatePriceUnit('sale_');
+    // Initialize visibility on load
+    updatePriceInputVisibility('regular_');
+    updatePriceInputVisibility('sale_');
 
-    // Update regular price unit based on action
+    // Update regular price input visibility based on action
     $('#regular_price_action').change(function() {
-        updatePriceUnit('regular_');
+        updatePriceInputVisibility('regular_');
     });
 
-    // Update sale price unit based on action
+    // Update sale price input visibility based on action
     $('#sale_price_action').change(function() {
-        updatePriceUnit('sale_');
+        updatePriceInputVisibility('sale_');
     });
 
     // Filter products with our optimized backend
