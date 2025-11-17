@@ -1,0 +1,122 @@
+# Translation file for WooCommerce Bulk Price Editor
+# Copyright (C) 2025
+# This file is distributed under the same license as the WooCommerce Bulk Price Editor package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce Bulk Price Editor 1.5.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-17 00:00:00+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: wc-bulk-price-editor.php
+msgid "Bulk Price Editor"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "WooCommerce Bulk Price Editor requires WooCommerce to be installed and active."
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "WooCommerce Bulk Price Editor"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Filter Products"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Search Word/Name"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Enter product name"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Search for products containing this word"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Product Category"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "All Categories"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Filter by product category"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Test AJAX"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Filter Products"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Speed Up Database"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Products"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Update Prices"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Regular Price"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Do Not Change"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Set Fixed Price"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Increase by %"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Decrease by %"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Value"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Enter price or percentage"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Sale Price"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Decrease by % (from Regular)"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Clear Sale Price"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Enter sale price"
+msgstr ""
+
+#: wc-bulk-price-editor.php
+msgid "Results"
+msgstr ""

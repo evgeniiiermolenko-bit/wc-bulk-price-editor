@@ -4,6 +4,8 @@
  * Description: Bulk edit product prices with filtering
  * Version: 1.5.1
  * Author: Evgenii
+ * Text Domain: wc-bulk-price-editor
+ * Domain Path: /languages
  */
 
 // Prevent direct access
@@ -26,6 +28,9 @@ class WC_Bulk_Price_Editor {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
         
+        // Load translations
+        load_plugin_textdomain('wc-bulk-price-editor', false, dirname(plugin_basename(__FILE__)) . '/languages');
+        
         // AJAX actions
         add_action('wp_ajax_wc_bulk_price_test', array($this, 'ajax_test'));
         add_action('wp_ajax_wc_bulk_price_filter', array($this, 'ajax_filter_products'));
@@ -44,14 +49,15 @@ class WC_Bulk_Price_Editor {
     }
 
     public function woocommerce_missing_notice() {
-        echo '<div class="error"><p><strong>WooCommerce Bulk Price Editor</strong> requires WooCommerce to be installed and active.</p></div>';
+        // Notice temporarily hidden
+        // echo '<div class="error"><p><strong>' . esc_html__('WooCommerce Bulk Price Editor', 'wc-bulk-price-editor') . '</strong> ' . esc_html__('requires WooCommerce to be installed and active.', 'wc-bulk-price-editor') . '</p></div>';
     }
 
     public function add_admin_menu() {
         add_submenu_page(
             'woocommerce',
-            'Bulk Price Editor',
-            'Bulk Price Editor',
+            __('Bulk Price Editor', 'wc-bulk-price-editor'),
+            __('Bulk Price Editor', 'wc-bulk-price-editor'),
             'manage_woocommerce',
             'wc-bulk-price-editor',
             array($this, 'admin_page')
@@ -843,80 +849,80 @@ class WC_Bulk_Price_Editor {
     public function admin_page() {
         ?>
         <div class="wrap">
-            <h1>WooCommerce Bulk Price Editor (Fixed)</h1>
+            <h1><?php esc_html_e('WooCommerce Bulk Price Editor', 'wc-bulk-price-editor'); ?></h1>
 
             <div class="filter-section">
-                <h2>Filter Products</h2>
+                <h2><?php esc_html_e('Filter Products', 'wc-bulk-price-editor'); ?></h2>
                 <table class="form-table">
                     <tr>
-                        <th><label for="search_word">Search Word/Name</label></th>
+                        <th><label for="search_word"><?php esc_html_e('Search Word/Name', 'wc-bulk-price-editor'); ?></label></th>
                         <td>
-                            <input type="text" id="search_word" name="search_word" placeholder="Enter product name" class="regular-text" />
-                            <p class="description">Search for products containing this word</p>
+                            <input type="text" id="search_word" name="search_word" placeholder="<?php esc_attr_e('Enter product name', 'wc-bulk-price-editor'); ?>" class="regular-text" />
+                            <p class="description"><?php esc_html_e('Search for products containing this word', 'wc-bulk-price-editor'); ?></p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="category_id">Product Category</label></th>
+                        <th><label for="category_id"><?php esc_html_e('Product Category', 'wc-bulk-price-editor'); ?></label></th>
                         <td>
                             <select id="category_id" name="category_id" class="regular-text">
-                                <option value="">All Categories</option>
+                                <option value=""><?php esc_html_e('All Categories', 'wc-bulk-price-editor'); ?></option>
                             </select>
-                            <p class="description">Filter by product category</p>
+                            <p class="description"><?php esc_html_e('Filter by product category', 'wc-bulk-price-editor'); ?></p>
                         </td>
                     </tr>
                 </table>
                 <p class="submit">
-                    <input type="button" id="test-ajax" class="button-secondary" value="Test AJAX" />
-                    <input type="button" id="filter-products" class="button-primary" value="Filter Products" />
-                    <input type="button" id="cleanup-database" class="button-secondary" value="Speed Up Database" style="background: #d63638; border-color: #d63638; color: white;" />
+                    <input type="button" id="test-ajax" class="button-secondary" value="<?php esc_attr_e('Test AJAX', 'wc-bulk-price-editor'); ?>" />
+                    <input type="button" id="filter-products" class="button-primary" value="<?php esc_attr_e('Filter Products', 'wc-bulk-price-editor'); ?>" />
+                    <input type="button" id="cleanup-database" class="button-secondary" value="<?php esc_attr_e('Speed Up Database', 'wc-bulk-price-editor'); ?>" style="background: #d63638; border-color: #d63638; color: white;" />
                 </p>
             </div>
 
             <div class="results-section" id="results-section" style="display: none;">
-                <h2>Products</h2>
+                <h2><?php esc_html_e('Products', 'wc-bulk-price-editor'); ?></h2>
                 <div id="product-results"></div>
 
                 <div class="price-update-section">
-                    <h3>Update Prices</h3>
+                    <h3><?php esc_html_e('Update Prices', 'wc-bulk-price-editor'); ?></h3>
                     <table class="form-table">
                         <tr>
-                            <th><label for="regular_price_action">Regular Price</label></th>
+                            <th><label for="regular_price_action"><?php esc_html_e('Regular Price', 'wc-bulk-price-editor'); ?></label></th>
                             <td>
                                 <select id="regular_price_action">
-                                    <option value="none">Do Not Change</option>
-                                    <option value="set">Set Fixed Price</option>
-                                    <option value="increase_percent">Increase by %</option>
-                                    <option value="decrease_percent">Decrease by %</option>
+                                    <option value="none"><?php esc_html_e('Do Not Change', 'wc-bulk-price-editor'); ?></option>
+                                    <option value="set"><?php esc_html_e('Set Fixed Price', 'wc-bulk-price-editor'); ?></option>
+                                    <option value="increase_percent"><?php esc_html_e('Increase by %', 'wc-bulk-price-editor'); ?></option>
+                                    <option value="decrease_percent"><?php esc_html_e('Decrease by %', 'wc-bulk-price-editor'); ?></option>
                                 </select>
                             </td>
                         </tr>
                         <tr class="regular-price-value-row">
-                            <th><label for="regular_price_value">Value</label></th>
-                            <td><input type="number" id="regular_price_value" step="0.01" min="0" placeholder="Enter price or percentage" /></td>
+                            <th><label for="regular_price_value"><?php esc_html_e('Value', 'wc-bulk-price-editor'); ?></label></th>
+                            <td><input type="number" id="regular_price_value" step="0.01" min="0" placeholder="<?php esc_attr_e('Enter price or percentage', 'wc-bulk-price-editor'); ?>" /></td>
                         </tr>
                         <tr>
-                            <th><label for="sale_price_action">Sale Price</label></th>
+                            <th><label for="sale_price_action"><?php esc_html_e('Sale Price', 'wc-bulk-price-editor'); ?></label></th>
                             <td>
                                 <select id="sale_price_action">
-                                    <option value="none">Do Not Change</option>
-                                    <option value="set">Set Fixed Price</option>
-                                    <option value="decrease_percent">Decrease by % (from Regular)</option>
-                                    <option value="clear_sale">Clear Sale Price</option>
+                                    <option value="none"><?php esc_html_e('Do Not Change', 'wc-bulk-price-editor'); ?></option>
+                                    <option value="set"><?php esc_html_e('Set Fixed Price', 'wc-bulk-price-editor'); ?></option>
+                                    <option value="decrease_percent"><?php esc_html_e('Decrease by % (from Regular)', 'wc-bulk-price-editor'); ?></option>
+                                    <option value="clear_sale"><?php esc_html_e('Clear Sale Price', 'wc-bulk-price-editor'); ?></option>
                                 </select>
                             </td>
                         </tr>
                         <tr class="sale-price-value-row">
-                            <th><label for="sale_price_value">Value</label></th>
-                            <td><input type="number" id="sale_price_value" step="0.01" min="0" placeholder="Enter sale price" /></td>
+                            <th><label for="sale_price_value"><?php esc_html_e('Value', 'wc-bulk-price-editor'); ?></label></th>
+                            <td><input type="number" id="sale_price_value" step="0.01" min="0" placeholder="<?php esc_attr_e('Enter sale price', 'wc-bulk-price-editor'); ?>" /></td>
                         </tr>
                     </table>
                     
                     <p class="submit">
-                        <input type="button" id="update-prices" class="button-primary" value="Update Prices" />
+                        <input type="button" id="update-prices" class="button-primary" value="<?php esc_attr_e('Update Prices', 'wc-bulk-price-editor'); ?>" />
                     </p>
                     
                     <div id="update-results" style="display: none;">
-                        <h4>Results</h4>
+                        <h4><?php esc_html_e('Results', 'wc-bulk-price-editor'); ?></h4>
                         <div id="update-message"></div>
                     </div>
                 </div>

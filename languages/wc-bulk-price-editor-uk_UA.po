@@ -1,0 +1,121 @@
+# Ukrainian translation for WooCommerce Bulk Price Editor
+# Copyright (C) 2025
+# This file is distributed under the same license as the WooCommerce Bulk Price Editor package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce Bulk Price Editor 1.5.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-17 00:00:00+00:00\n"
+"PO-Revision-Date: 2025-11-17 00:00:00+00:00\n"
+"Last-Translator: \n"
+"Language-Team: Ukrainian\n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: wc-bulk-price-editor.php
+msgid "Bulk Price Editor"
+msgstr "Редактор масового редагування цін"
+
+#: wc-bulk-price-editor.php
+msgid "WooCommerce Bulk Price Editor requires WooCommerce to be installed and active."
+msgstr "WooCommerce Bulk Price Editor потребує встановлення та активації WooCommerce."
+
+#: wc-bulk-price-editor.php
+msgid "WooCommerce Bulk Price Editor"
+msgstr "Редактор масового редагування цін WooCommerce"
+
+#: wc-bulk-price-editor.php
+msgid "Filter Products"
+msgstr "Фільтрувати товари"
+
+#: wc-bulk-price-editor.php
+msgid "Search Word/Name"
+msgstr "Слово пошуку/Назва"
+
+#: wc-bulk-price-editor.php
+msgid "Enter product name"
+msgstr "Введіть назву товару"
+
+#: wc-bulk-price-editor.php
+msgid "Search for products containing this word"
+msgstr "Шукати товари, які містять це слово"
+
+#: wc-bulk-price-editor.php
+msgid "Product Category"
+msgstr "Категорія товару"
+
+#: wc-bulk-price-editor.php
+msgid "All Categories"
+msgstr "Всі категорії"
+
+#: wc-bulk-price-editor.php
+msgid "Filter by product category"
+msgstr "Фільтрувати за категорією товару"
+
+#: wc-bulk-price-editor.php
+msgid "Test AJAX"
+msgstr "Тест AJAX"
+
+#: wc-bulk-price-editor.php
+msgid "Speed Up Database"
+msgstr "Прискорити базу даних"
+
+#: wc-bulk-price-editor.php
+msgid "Products"
+msgstr "Товари"
+
+#: wc-bulk-price-editor.php
+msgid "Update Prices"
+msgstr "Оновити ціни"
+
+#: wc-bulk-price-editor.php
+msgid "Regular Price"
+msgstr "Звичайна ціна"
+
+#: wc-bulk-price-editor.php
+msgid "Do Not Change"
+msgstr "Не змінювати"
+
+#: wc-bulk-price-editor.php
+msgid "Set Fixed Price"
+msgstr "Встановити фіксовану ціну"
+
+#: wc-bulk-price-editor.php
+msgid "Increase by %"
+msgstr "Збільшити на %"
+
+#: wc-bulk-price-editor.php
+msgid "Decrease by %"
+msgstr "Зменшити на %"
+
+#: wc-bulk-price-editor.php
+msgid "Value"
+msgstr "Значення"
+
+#: wc-bulk-price-editor.php
+msgid "Enter price or percentage"
+msgstr "Введіть ціну або відсоток"
+
+#: wc-bulk-price-editor.php
+msgid "Sale Price"
+msgstr "Ціна розпродажу"
+
+#: wc-bulk-price-editor.php
+msgid "Decrease by % (from Regular)"
+msgstr "Зменшити на % (від звичайної ціни)"
+
+#: wc-bulk-price-editor.php
+msgid "Clear Sale Price"
+msgstr "Очистити ціну розпродажу"
+
+#: wc-bulk-price-editor.php
+msgid "Enter sale price"
+msgstr "Введіть ціну розпродажу"
+
+#: wc-bulk-price-editor.php
+msgid "Results"
+msgstr "Результати"

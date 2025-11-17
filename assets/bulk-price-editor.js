@@ -36,7 +36,8 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 console.log('✅ AJAX Test Success:', response);
-                alert('AJAX Connection Working! Check console for details.');
+                // AJAX test alerts temporarily hidden
+                // alert('AJAX Connection Working! Check console for details.');
             },
             error: function(xhr, status, error) {
                 console.error('❌ AJAX Test Failed:', {
@@ -45,7 +46,8 @@ jQuery(document).ready(function($) {
                     responseText: xhr.responseText,
                     error: error
                 });
-                alert('AJAX Test Failed! Status: ' + xhr.status + '. Check console for details.');
+                // AJAX test alerts temporarily hidden
+                // alert('AJAX Test Failed! Status: ' + xhr.status + '. Check console for details.');
             }
         });
     }
