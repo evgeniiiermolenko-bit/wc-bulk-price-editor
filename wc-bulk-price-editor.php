@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WooCommerce Bulk Price Editor
  * Description: Bulk edit product prices with filtering
- * Version: 1.5.1
+ * Version: 1.6.1
  * Author: Evgenii
  * Text Domain: wc-bulk-price-editor
  * Domain Path: /languages
