@@ -3,8 +3,11 @@ jQuery(document).ready(function($) {
     let successfulBatches = 0;
     let totalBatches = 0;
     
-    // Load categories on page load
-    loadCategories();
+    // Load categories on page load after small delay to ensure DOM is ready
+    setTimeout(function() {
+        console.log('Loading categories...');
+        loadCategories();
+    }, 500);
     
     // Test AJAX connection on page load
     setTimeout(function() {
@@ -357,6 +360,7 @@ jQuery(document).ready(function($) {
     }
     
     function loadCategories() {
+        console.log('loadCategories called');
         $('#category_id').html('<option value="">Loading...</option>');
         
         $.ajax({
@@ -367,13 +371,20 @@ jQuery(document).ready(function($) {
                 nonce: wcBulkPrice.nonce
             },
             success: function(response) {
+                console.log('Categories loaded successfully:', response);
                 if (response.success) {
                     $('#category_id').html(response.data.html);
                 } else {
+                    console.error('Server error:', response.data.message);
                     $('#category_id').html('<option value="">Error loading categories</option>');
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                console.error('loadCategories AJAX error:', {
+                    status: status,
+                    error: error,
+                    responseText: xhr.responseText
+                });
                 $('#category_id').html('<option value="">Error loading categories</option>');
             }
         });
