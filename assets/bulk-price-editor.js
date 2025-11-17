@@ -21,6 +21,43 @@ jQuery(document).ready(function($) {
         testAjaxConnection();
     });
     
+    // Database cleanup button
+    $('#cleanup-database').click(function() {
+        // Confirmation temporarily hidden
+        // if (!confirm('This will clean up unnecessary database entries to speed up your site. Continue?')) {
+        //     return;
+        // }
+        
+        console.log('Database cleanup initiated');
+        $(this).prop('disabled', true).val('Cleaning...');
+        
+        $.ajax({
+            url: wcBulkPrice.ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'wc_bulk_price_cleanup_db',
+                nonce: wcBulkPrice.nonce
+            },
+            success: function(response) {
+                console.log('Cleanup success:', response);
+                // Alerts temporarily hidden
+                // if (response.success) {
+                //     alert('✅ Database cleanup completed! ' + response.data.message);
+                // } else {
+                //     alert('❌ Cleanup failed: ' + response.data.message);
+                // }
+            },
+            error: function(xhr, status, error) {
+                console.error('Cleanup error:', error);
+                // Alerts temporarily hidden
+                // alert('❌ Cleanup request failed');
+            },
+            complete: function() {
+                $('#cleanup-database').prop('disabled', false).val('Speed Up Database');
+            }
+        });
+    });
+    
     function testAjaxConnection() {
         console.log('Testing AJAX with:', {
             url: wcBulkPrice.ajaxurl,
