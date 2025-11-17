@@ -31,6 +31,7 @@ class WC_Bulk_Price_Editor {
         add_action('wp_ajax_wc_bulk_price_filter', array($this, 'ajax_filter_products'));
         add_action('wp_ajax_wc_bulk_price_load_categories', array($this, 'ajax_load_categories'));
         add_action('wp_ajax_wc_bulk_price_simple_update', array($this, 'ajax_simple_update'));
+        add_action('wp_ajax_wc_bulk_price_batch_update', array($this, 'ajax_batch_update'));
         add_action('wp_ajax_wc_bulk_price_cleanup_db', array($this, 'ajax_cleanup_database'));
         
         add_action('admin_init', array($this, 'check_woocommerce'));
@@ -517,6 +518,247 @@ class WC_Bulk_Price_Editor {
             wp_send_json_error(array('message' => 'Error: ' . $e->getMessage()));
         }
     }
+
+    public function ajax_batch_update() {
+        if (!wp_verify_nonce($_POST['nonce'], 'wc_bulk_price_nonce')) {
+            wp_send_json_error(array('message' => 'Nonce failed'));
+        }
+        
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
+        $product_ids = explode(',', sanitize_text_field($_POST['product_ids']));
+        $regular_action = sanitize_text_field($_POST['regular_price_action']);
+        $regular_value = floatval($_POST['regular_price_value']);
+        $sale_action = sanitize_text_field($_POST['sale_price_action']);
+        $sale_value = floatval($_POST['sale_price_value']);
+        
+        if (empty($product_ids)) {
+            wp_send_json_error(array('message' => 'No products specified'));
+        }
+        
+        $successful = 0;
+        $failed = 0;
+        
+        foreach ($product_ids as $product_id) {
+            $product_id = intval($product_id);
+            if (!$product_id) continue;
+            
+            // Call the update logic for each product
+            try {
+                global $wpdb;
+                
+                // Check if this is a variation or simple product
+                $post_type = $wpdb->get_var($wpdb->prepare(
+                    "SELECT post_type FROM {$wpdb->posts} WHERE ID = %d",
+                    $product_id
+                ));
+                
+                if (!$post_type || !in_array($post_type, array('product', 'product_variation'))) {
+                    $failed++;
+                    continue;
+                }
+                
+                // Get current prices
+                $current_regular_row = $wpdb->get_var($wpdb->prepare(
+                    "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_regular_price'",
+                    $product_id
+                ));
+                
+                $current_sale_row = $wpdb->get_var($wpdb->prepare(
+                    "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_sale_price'",
+                    $product_id
+                ));
+                
+                $current_regular = floatval($current_regular_row ?: 0);
+                $current_sale = floatval($current_sale_row ?: 0);
+                
+                $new_regular = $current_regular;
+                $new_sale = $current_sale;
+                $changes_made = false;
+                
+                // Calculate new regular price
+                if ($regular_action === 'set' && $regular_value > 0) {
+                    $new_regular = $regular_value;
+                } elseif ($regular_action === 'increase_percent' && $regular_value != 0) {
+                    if ($current_regular > 0) {
+                        $new_regular = $current_regular * (1 + ($regular_value / 100));
+                    } else {
+                        $failed++;
+                        continue;
+                    }
+                } elseif ($regular_action === 'decrease_percent' && $regular_value != 0) {
+                    if ($current_regular > 0) {
+                        $new_regular = $current_regular * (1 - ($regular_value / 100));
+                        $new_regular = max(0, $new_regular);
+                    }
+                }
+                
+                // Calculate new sale price
+                if ($sale_action === 'set' && $sale_value > 0) {
+                    $new_sale = $sale_value;
+                } elseif ($sale_action === 'decrease_percent' && $sale_value != 0) {
+                    // Calculate sale price as a percentage decrease from the NEW regular price
+                    $base_regular = ($regular_action !== 'none' && abs($new_regular - $current_regular) > 0.01) ? $new_regular : $current_regular;
+                    if ($base_regular > 0) {
+                        $new_sale = $base_regular * (1 - ($sale_value / 100));
+                        $new_sale = max(0, $new_sale);
+                    } else {
+                        $failed++;
+                        continue;
+                    }
+                } elseif ($sale_action === 'clear_sale') {
+                    $new_sale = 0;
+                }
+                
+                // Update regular price if needed
+                if ($regular_action !== 'none' && abs($new_regular - $current_regular) > 0.01) {
+                    $formatted_price = number_format($new_regular, 2, '.', '');
+                    
+                    $existing = $wpdb->get_var($wpdb->prepare(
+                        "SELECT meta_id FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_regular_price'",
+                        $product_id
+                    ));
+                    
+                    if ($existing) {
+                        $wpdb->update(
+                            $wpdb->postmeta,
+                            array('meta_value' => $formatted_price),
+                            array('post_id' => $product_id, 'meta_key' => '_regular_price'),
+                            array('%s'),
+                            array('%d', '%s')
+                        );
+                    } else {
+                        $wpdb->insert(
+                            $wpdb->postmeta,
+                            array(
+                                'post_id' => $product_id,
+                                'meta_key' => '_regular_price',
+                                'meta_value' => $formatted_price
+                            ),
+                            array('%d', '%s', '%s')
+                        );
+                    }
+                    $changes_made = true;
+                }
+                
+                // Update sale price if needed
+                if ($sale_action === 'clear_sale' && $current_sale > 0) {
+                    $wpdb->delete(
+                        $wpdb->postmeta,
+                        array('post_id' => $product_id, 'meta_key' => '_sale_price'),
+                        array('%d', '%s')
+                    );
+                    $changes_made = true;
+                    
+                } elseif ($sale_action !== 'none' && $sale_action !== 'clear_sale' && abs($new_sale - $current_sale) > 0.01) {
+                    $formatted_price = number_format($new_sale, 2, '.', '');
+                    
+                    $existing = $wpdb->get_var($wpdb->prepare(
+                        "SELECT meta_id FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_sale_price'",
+                        $product_id
+                    ));
+                    
+                    if ($existing) {
+                        $wpdb->update(
+                            $wpdb->postmeta,
+                            array('meta_value' => $formatted_price),
+                            array('post_id' => $product_id, 'meta_key' => '_sale_price'),
+                            array('%s'),
+                            array('%d', '%s')
+                        );
+                    } else {
+                        $wpdb->insert(
+                            $wpdb->postmeta,
+                            array(
+                                'post_id' => $product_id,
+                                'meta_key' => '_sale_price',
+                                'meta_value' => $formatted_price
+                            ),
+                            array('%d', '%s', '%s')
+                        );
+                    }
+                    $changes_made = true;
+                }
+                
+                // Update display price if changes were made
+                if ($changes_made) {
+                    $final_regular = ($regular_action !== 'none' && abs($new_regular - $current_regular) > 0.01) ? $new_regular : $current_regular;
+                    $final_sale = ($sale_action === 'clear_sale') ? 0 : (($sale_action !== 'none' && abs($new_sale - $current_sale) > 0.01) ? $new_sale : $current_sale);
+                    
+                    $display_price = ($final_sale > 0) ? $final_sale : $final_regular;
+                    $formatted_display = number_format($display_price, 2, '.', '');
+                    
+                    $existing_price = $wpdb->get_var($wpdb->prepare(
+                        "SELECT meta_id FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_price'",
+                        $product_id
+                    ));
+                    
+                    if ($existing_price) {
+                        $wpdb->update(
+                            $wpdb->postmeta,
+                            array('meta_value' => $formatted_display),
+                            array('post_id' => $product_id, 'meta_key' => '_price'),
+                            array('%s'),
+                            array('%d', '%s')
+                        );
+                    } else {
+                        $wpdb->insert(
+                            $wpdb->postmeta,
+                            array(
+                                'post_id' => $product_id,
+                                'meta_key' => '_price',
+                                'meta_value' => $formatted_display
+                            ),
+                            array('%d', '%s', '%s')
+                        );
+                    }
+                    
+                    // Update parent if this is a variation
+                    if ($post_type === 'product_variation') {
+                        $parent_id = $wpdb->get_var($wpdb->prepare(
+                            "SELECT post_parent FROM {$wpdb->posts} WHERE ID = %d",
+                            $product_id
+                        ));
+                        
+                        if ($parent_id) {
+                            wp_cache_delete($parent_id, 'post_meta');
+                            wc_delete_product_transients($parent_id);
+                            
+                            $parent_product = wc_get_product($parent_id);
+                            if ($parent_product && $parent_product->get_type() === 'variable') {
+                                $parent_product->sync($parent_id);
+                            }
+                        }
+                    }
+                    
+                    wp_cache_delete($product_id, 'post_meta');
+                    wc_delete_product_transients($product_id);
+                    
+                    $successful++;
+                } else {
+                    // No changes needed, still count as successful
+                    $successful++;
+                }
+                
+            } catch (Exception $e) {
+                error_log("ERROR in batch update for product $product_id: " . $e->getMessage());
+                $failed++;
+            }
+        }
+        
+        if ($successful > 0) {
+            wp_send_json_success(array(
+                'message' => "Batch processed: $successful successful, $failed failed"
+            ));
+        } else {
+            wp_send_json_error(array(
+                'message' => "Batch failed: $failed products failed"
+            ));
+        }
+    }
+
 
     // Database cleanup to improve performance
     public function ajax_cleanup_database() {
