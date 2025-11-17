@@ -85,7 +85,6 @@ class WC_Bulk_Price_Editor {
         .product-info { flex: 1; }
         .product-price { margin-left: auto; font-weight: bold; }
         .price-update-section { margin-top: 20px; padding: 20px; background: #f9f9f9; border: 1px solid #ddd; }
-        .regular-price-value-row, .sale-price-value-row { display: none; }
         #selected-count { font-size: 12px; }
         ');
     }
