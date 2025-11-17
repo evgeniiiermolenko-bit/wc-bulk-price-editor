@@ -31,6 +31,11 @@ class WC_Bulk_Price_Editor {
         // Load translations
         load_plugin_textdomain('wc-bulk-price-editor', false, dirname(plugin_basename(__FILE__)) . '/languages');
         
+        // DEBUG: Check if translations loaded (remove after testing)
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Translation loaded for locale: ' . get_locale());
+        }
+        
         // AJAX actions
         add_action('wp_ajax_wc_bulk_price_test', array($this, 'ajax_test'));
         add_action('wp_ajax_wc_bulk_price_filter', array($this, 'ajax_filter_products'));
